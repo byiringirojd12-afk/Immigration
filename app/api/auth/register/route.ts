@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
-    });
+    }).catch(() => null);
 
     if (existingUser) {
       return NextResponse.json({ message: "Email is already registered" }, { status: 409 });
@@ -39,6 +39,9 @@ export async function POST(request: Request) {
           },
         },
       },
+    }).catch((err) => {
+      console.error("Failed to create user:", err);
+      throw new Error("Database setup is incomplete. Please run the Prisma migration or seed step.");
     });
 
     // Create audit log
@@ -53,6 +56,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Registration successful" }, { status: 201 });
   } catch (error) {
     console.error("Registration error:", error);
-    return NextResponse.json({ message: "An error occurred during registration" }, { status: 500 });
+    const message = error instanceof Error ? error.message : "An error occurred during registration";
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

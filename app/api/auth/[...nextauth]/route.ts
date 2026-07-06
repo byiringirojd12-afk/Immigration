@@ -18,13 +18,13 @@ export const authOptions: NextAuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
-        });
+        }).catch(() => null);
 
         if (!user || !user.isActive) {
           return null;
         }
 
-        const isValid = await verifyPassword(credentials.password, user.passwordHash);
+        const isValid = await verifyPassword(credentials.password, user.passwordHash).catch(() => false);
 
         if (!isValid) {
           return null;

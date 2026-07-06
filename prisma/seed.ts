@@ -3,6 +3,11 @@ const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
+const adminEmail = process.env.DEFAULT_ADMIN_EMAIL || 'admin@immigration.gov';
+const adminPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'Admin@123456';
+const officerEmail = process.env.DEFAULT_OFFICER_EMAIL || 'officer@immigration.gov';
+const officerPassword = process.env.DEFAULT_OFFICER_PASSWORD || 'Officer@123456';
+
 const countries = [
   { name: 'Afghanistan', alpha2: 'AF', alpha3: 'AFG', nationality: 'Afghan', flagEmoji: '🇦🇫', phoneCode: '+93', currency: 'AFN', timezone: 'Asia/Kabul' },
   { name: 'Albania', alpha2: 'AL', alpha3: 'ALB', nationality: 'Albanian', flagEmoji: '🇦🇱', phoneCode: '+355', currency: 'ALL', timezone: 'Europe/Tirane' },
@@ -286,12 +291,16 @@ async function main() {
 
   // 4. Seed Default Admin
   console.log('Seeding default users...');
-  const adminPasswordHash = await bcrypt.hash('Admin@123456', 12);
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@immigration.gov' },
-    update: {},
+  const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      passwordHash: adminPasswordHash,
+      role: 'ADMIN',
+      isActive: true,
+    },
     create: {
-      email: 'admin@immigration.gov',
+      email: adminEmail,
       passwordHash: adminPasswordHash,
       role: 'ADMIN',
       admin: {
@@ -305,12 +314,16 @@ async function main() {
   });
 
   // 5. Seed Default Officer
-  const officerPasswordHash = await bcrypt.hash('Officer@123456', 12);
-  const officerUser = await prisma.user.upsert({
-    where: { email: 'officer@immigration.gov' },
-    update: {},
+  const officerPasswordHash = await bcrypt.hash(officerPassword, 12);
+  await prisma.user.upsert({
+    where: { email: officerEmail },
+    update: {
+      passwordHash: officerPasswordHash,
+      role: 'OFFICER',
+      isActive: true,
+    },
     create: {
-      email: 'officer@immigration.gov',
+      email: officerEmail,
       passwordHash: officerPasswordHash,
       role: 'OFFICER',
       officer: {
@@ -325,6 +338,8 @@ async function main() {
   });
 
   console.log('Seeding completed!');
+  console.log(`Admin login: ${adminEmail}`);
+  console.log('Password is controlled by DEFAULT_ADMIN_PASSWORD');
 }
 
 main()
