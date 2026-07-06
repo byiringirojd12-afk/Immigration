@@ -5,7 +5,15 @@ import { createAuditLog, AuditActions } from "@/lib/audit";
 
 export async function POST(request: Request) {
   try {
-    const { email, password, firstName, lastName } = await request.json();
+    let body: any = {};
+
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ message: "Invalid JSON payload" }, { status: 400 });
+    }
+
+    const { email, password, firstName, lastName } = body;
 
     if (!email || !password || !firstName || !lastName) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
