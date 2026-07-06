@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
 
   // Define public paths that don't require authentication
-  const isPublicPath = path === '/' || path === '/login' || path === '/register' || path === '/forgot-password';
+  const isPublicPath = path === '/' || path === '/login' || path === '/register' || path === '/forgot-password' || path === '/reset-password';
 
   // Extract the token
   const token = await getToken({ 

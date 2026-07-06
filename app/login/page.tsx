@@ -73,7 +73,8 @@ export default function LoginPage() {
         </form>
         
         <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem' }}>
-          <p>Don&apos;t have an account? <Link href="/register">Register here</Link></p>
+          <p><Link href="/forgot-password">Forgot password?</Link></p>
+          <p style={{ marginTop: '0.5rem' }}>Don&apos;t have an account? <Link href="/register">Register here</Link></p>
         </div>
       </div>
     </div>
