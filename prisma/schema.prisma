@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users & Roles ───────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("APPLICANT") // APPLICANT, OFFICER, ADMIN
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  applicant     Applicant?
+  officer       Officer?
+  admin         Admin?
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  reports       Report[]
+  settingUpdates SystemSetting[] @relation("SettingUpdater")
+}
+
+model Applicant {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  firstName     String   @default("")
+  lastName      String   @default("")
+  dateOfBirth   String?
+  gender        String?  // MALE, FEMALE, OTHER
+  nationality   String?
+  passportNumber String?
+  passportExpiry String?
+  phone         String?
+  address       String?
+  city          String?
+  state         String?
+  zipCode       String?
+  countryId     String?
+  profilePhoto  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  country      Country?          @relation(fields: [countryId], references: [id])
+  applications VisaApplication[]
+}
+
+model Officer {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  firstName   String   @default("")
+  lastName    String   @default("")
+  department  String?
+  badgeNumber String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewedDocuments UploadedDocument[] @relation("DocumentVerifier")
+  appointments      Appointment[]
+  assignedApps      VisaApplication[] @relation("AssignedOfficer")
+}
+
+model Admin {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  firstName  String   @default("")
+  lastName   String   @default("")
+  superAdmin Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Visa & Applications ─────────────────────────────────────
+
+model VisaType {
+  id              String   @id @default(uuid())
+  name            String
+  code            String   @unique
+  description     String?
+  processingDays  Int      @default(30)
+  fee             Float    @default(0)
+  currency        String   @default("USD")
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  requiredDocuments RequiredDocument[]
+  applications      VisaApplication[]
+}
+
+model VisaApplication {
+  id                   String   @id @default(uuid())
+  applicantId          String
+  visaTypeId           String
+  destinationCountryId String
+  status               String   @default("DRAFT") // DRAFT, SUBMITTED, UNDER_REVIEW, DOCUMENTS_REQUESTED, INTERVIEW_SCHEDULED, APPROVED, REJECTED
+  travelDate           String?
+  returnDate           String?
+  purpose              String?
+  additionalNotes      String?
+  rejectionReason      String?
+  approvalNotes        String?
+  assignedOfficerId    String?
+  submittedAt          DateTime?
+  reviewedAt           DateTime?
+  decidedAt            DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  applicant          Applicant          @relation(fields: [applicantId], references: [id])
+  visaType           VisaType           @relation(fields: [visaTypeId], references: [id])
+  destinationCountry Country            @relation(fields: [destinationCountryId], references: [id])
+  assignedOfficer    Officer?           @relation("AssignedOfficer", fields: [assignedOfficerId], references: [id])
+  documents          UploadedDocument[]
+  payments           Payment[]
+  appointments       Appointment[]
+}
+
+// ─── Countries ───────────────────────────────────────────────
+
+model Country {
+  id           String  @id @default(uuid())
+  name         String
+  alpha2       String  @unique
+  alpha3       String  @unique
+  nationality  String
+  flagEmoji    String
+  phoneCode    String
+  currency     String
+  timezone     String
+  visaAvailable Boolean @default(true)
+  isActive     Boolean @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  applicants   Applicant[]
+  applications VisaApplication[]
+}
+
+// ─── Documents ───────────────────────────────────────────────
+
+model RequiredDocument {
+  id          String  @id @default(uuid())
+  visaTypeId  String
+  name        String
+  description String?
+  isMandatory Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  visaType  VisaType           @relation(fields: [visaTypeId], references: [id], onDelete: Cascade)
+  uploads   UploadedDocument[]
+}
+
+model UploadedDocument {
+  id               String   @id @default(uuid())
+  applicationId    String
+  requiredDocId    String?
+  fileName         String
+  originalName     String
+  filePath         String
+  fileSize         Int
+  mimeType         String
+  status           String   @default("PENDING") // PENDING, VERIFIED, REJECTED
+  verifiedById     String?
+  rejectionReason  String?
+  uploadedAt       DateTime @default(now())
+  verifiedAt       DateTime?
+
+  application  VisaApplication  @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  requiredDoc  RequiredDocument? @relation(fields: [requiredDocId], references: [id])
+  verifiedBy   Officer?         @relation("DocumentVerifier", fields: [verifiedById], references: [id])
+}
+
+// ─── Payments ────────────────────────────────────────────────
+
+model Payment {
+  id            String   @id @default(uuid())
+  applicationId String
+  amount        Float
+  currency      String   @default("USD")
+  method        String?  // CREDIT_CARD, DEBIT_CARD, BANK_TRANSFER, PAYPAL
+  transactionId String?
+  status        String   @default("PENDING") // PENDING, COMPLETED, FAILED, REFUNDED
+  paidAt        DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  application VisaApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+// ─── Appointments ────────────────────────────────────────────
+
+model Appointment {
+  id            String   @id @default(uuid())
+  applicationId String
+  officerId     String?
+  dateTime      String
+  type          String   // INTERVIEW, BIOMETRICS, COLLECTION
+  status        String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED, RESCHEDULED
+  location      String?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  application VisaApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  officer     Officer?        @relation(fields: [officerId], references: [id])
+}
+
+// ─── Notifications ───────────────────────────────────────────
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String   @default("INFO") // INFO, SUCCESS, WARNING, ERROR, APPLICATION_UPDATE, DOCUMENT_REQUEST, PAYMENT, APPOINTMENT
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Audit Logs ──────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  role      String?
+  action    String
+  entity    String
+  entityId  String?
+  oldValue  String?
+  newValue  String?
+  ipAddress String?
+  device    String?
+  timestamp DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+}
+
+// ─── Reports ─────────────────────────────────────────────────
+
+model Report {
+  id            String   @id @default(uuid())
+  generatedById String
+  type          String
+  title         String
+  parameters    String?
+  data          String?
+  createdAt     DateTime @default(now())
+
+  generatedBy User @relation(fields: [generatedById], references: [id])
+}
+
+// ─── System Settings ─────────────────────────────────────────
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedById String?
+  updatedAt   DateTime @updatedAt
+
+  updatedBy User? @relation("SettingUpdater", fields: [updatedById], references: [id])
+}
