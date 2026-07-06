@@ -6,7 +6,7 @@ import { createAuditLog, AuditActions } from "@/lib/audit";
 export async function POST(request: Request) {
   try {
     if (!process.env.DATABASE_URL) {
-      return NextResponse.json({ message: "Database is not configured. Set DATABASE_URL to your Supabase connection string." }, { status: 500 });
+      return NextResponse.json({ message: "Database is not configured. Please check your local database setup." }, { status: 500 });
     }
 
     let body: any = {};
@@ -18,8 +18,11 @@ export async function POST(request: Request) {
     }
 
     const { email, password, firstName, lastName } = body;
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const normalizedFirstName = String(firstName || "").trim();
+    const normalizedLastName = String(lastName || "").trim();
 
-    if (!email || !password || !firstName || !lastName) {
+    if (!normalizedEmail || !password || !normalizedFirstName || !normalizedLastName) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
@@ -29,7 +32,7 @@ export async function POST(request: Request) {
 
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     }).catch(() => null);
 
     if (existingUser) {
@@ -41,19 +44,19 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.create({
       data: {
-        email,
+        email: normalizedEmail,
         passwordHash,
         role: "APPLICANT",
         applicant: {
           create: {
-            firstName,
-            lastName,
+            firstName: normalizedFirstName,
+            lastName: normalizedLastName,
           },
         },
       },
     }).catch((err) => {
       console.error("Failed to create user:", err);
-      throw new Error("Database connection failed. Ensure your Supabase database is running and Prisma migrations are applied.");
+      throw new Error("We couldn't create your account right now. Please try again shortly.");
     });
 
     // Create audit log

@@ -16,8 +16,10 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const normalizedEmail = String(credentials.email).trim().toLowerCase();
+
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
+          where: { email: normalizedEmail },
         }).catch(() => null);
 
         if (!user || !user.isActive) {
@@ -61,6 +63,7 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 24 * 60 * 60, // 24 hours
   },
+  trustHost: true,
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only-do-not-use-in-prod",
 };
 

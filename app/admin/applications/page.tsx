@@ -1,15 +1,14 @@
-import React from 'react';
+import ModuleState from '@/components/ModuleState';
 
 export default function Page() {
   return (
-    <div>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>System Module</h1>
-      <div className="card">
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Under Development</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          This section is currently being integrated and will be available shortly.
-        </p>
-      </div>
-    </div>
+    <ModuleState
+      eyebrow="Admin operations"
+      title="Applications workspace"
+      description="This area is ready for visa applications, case review, and status management with a more structured experience for staff."
+      features={["Case queue", "Review workflow", "Status updates"]}
+      actionLabel="Return to dashboard"
+      actionHref="/admin/dashboard"
+    />
   );
 }

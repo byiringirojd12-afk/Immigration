@@ -18,16 +18,18 @@ export default function LoginPage() {
     setError("");
 
     const res = await signIn("credentials", {
-      email,
+      email: email.trim().toLowerCase(),
       password,
       redirect: false,
     });
 
     if (res?.error) {
-      setError("Invalid email or password");
+      setError("Invalid email or password. Please try again.");
       setIsLoading(false);
     } else {
-      router.refresh(); // Middleware will redirect based on role
+      router.refresh();
+      router.replace("/");
+      setIsLoading(false);
     }
   };
 

@@ -10,18 +10,18 @@ export default function Sidebar({ role }: { role: string }) {
 
   return (
     <aside className="sidebar">
-      <div style={{ padding: '0 1.5rem', marginBottom: '2rem', fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--primary)' }}>
+      <div style={{ padding: '0 1.5rem', marginBottom: '1.5rem', fontSize: '1.2rem', fontWeight: 700, color: 'var(--primary)' }}>
         IMS {role === 'ADMIN' ? 'Admin' : role === 'OFFICER' ? 'Officer' : 'Portal'}
       </div>
-      <nav>
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
         {navItems.map((item) => (
           <Link 
             key={item.href} 
             href={item.href}
             className={`sidebar-link ${pathname.startsWith(item.href) ? 'active' : ''}`}
           >
-            <span style={{ marginRight: '1rem', fontSize: '1.25rem' }}>{item.icon}</span>
-            {item.label}
+            <span style={{ marginRight: '0.9rem', fontSize: '1.1rem' }}>{item.icon}</span>
+            <span>{item.label}</span>
           </Link>
         ))}
       </nav>
