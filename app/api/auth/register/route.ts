@@ -5,6 +5,10 @@ import { createAuditLog, AuditActions } from "@/lib/audit";
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json({ message: "Database is not configured. Set DATABASE_URL to your Supabase connection string." }, { status: 500 });
+    }
+
     let body: any = {};
 
     try {
@@ -49,7 +53,7 @@ export async function POST(request: Request) {
       },
     }).catch((err) => {
       console.error("Failed to create user:", err);
-      throw new Error("Database setup is incomplete. Please run the Prisma migration or seed step.");
+      throw new Error("Database connection failed. Ensure your Supabase database is running and Prisma migrations are applied.");
     });
 
     // Create audit log

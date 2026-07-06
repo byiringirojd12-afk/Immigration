@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-const databaseUrl = process.env.DATABASE_URL || 'file:./prisma/dev.db';
+const databaseUrl = process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/immigration';
 
 if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = databaseUrl;
