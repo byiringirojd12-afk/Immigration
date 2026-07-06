@@ -1,15 +1,18 @@
-import React from 'react';
+import ModuleState from "@/components/ModuleState";
 
 export default function Page() {
   return (
-    <div>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>System Module</h1>
-      <div className="card">
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Under Development</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          This section is currently being integrated and will be available shortly.
-        </p>
-      </div>
-    </div>
+    <ModuleState
+      eyebrow="Officer module"
+      title="Appointment Management"
+      description="Coordinate interviews, monitor attendance, and keep appointment outcomes organized for better follow-up."
+      features={[
+        "Scheduled visit tracking",
+        "Attendance outcomes",
+        "Follow-up reminders",
+      ]}
+      actionLabel="Back to dashboard"
+      actionHref="/officer/dashboard"
+    />
   );
 }

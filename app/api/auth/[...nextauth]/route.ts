@@ -63,7 +63,6 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
     maxAge: 24 * 60 * 60, // 24 hours
   },
-  trustHost: true,
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only-do-not-use-in-prod",
 };
 

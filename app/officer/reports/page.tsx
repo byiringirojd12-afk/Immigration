@@ -1,15 +1,18 @@
-import React from 'react';
+import ModuleState from "@/components/ModuleState";
 
 export default function Page() {
   return (
-    <div>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>System Module</h1>
-      <div className="card">
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Under Development</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          This section is currently being integrated and will be available shortly.
-        </p>
-      </div>
-    </div>
+    <ModuleState
+      eyebrow="Officer module"
+      title="Officer Reports"
+      description="Capture daily outcomes, review queue health, and document trends that affect processing efficiency."
+      features={[
+        "Daily processing summaries",
+        "Queue and workload insights",
+        "Operational trend tracking",
+      ]}
+      actionLabel="Back to dashboard"
+      actionHref="/officer/dashboard"
+    />
   );
 }

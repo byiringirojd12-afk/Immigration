@@ -1,15 +1,18 @@
-import React from 'react';
+import ModuleState from "@/components/ModuleState";
 
 export default function Page() {
   return (
-    <div>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>System Module</h1>
-      <div className="card">
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Under Development</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          This section is currently being integrated and will be available shortly.
-        </p>
-      </div>
-    </div>
+    <ModuleState
+      eyebrow="Admin module"
+      title="Visa Type Catalog"
+      description="Manage visa categories, processing timelines, fees, and the document rules tied to each type."
+      features={[
+        "Visa category setup",
+        "Fee and timeline controls",
+        "Document rule pairing",
+      ]}
+      actionLabel="Back to dashboard"
+      actionHref="/admin/dashboard"
+    />
   );
 }

@@ -1,15 +1,18 @@
-import React from 'react';
+import ModuleState from "@/components/ModuleState";
 
 export default function Page() {
   return (
-    <div>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>System Module</h1>
-      <div className="card">
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Under Development</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          This section is currently being integrated and will be available shortly.
-        </p>
-      </div>
-    </div>
+    <ModuleState
+      eyebrow="Admin module"
+      title="Payment Oversight"
+      description="Review payment statuses, transaction history, and completed fee collections for visa applications."
+      features={[
+        "Transaction monitoring",
+        "Payment status filtering",
+        "Revenue summaries",
+      ]}
+      actionLabel="Back to dashboard"
+      actionHref="/admin/dashboard"
+    />
   );
 }

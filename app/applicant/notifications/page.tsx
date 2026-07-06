@@ -1,15 +1,18 @@
-import React from 'react';
+import ModuleState from "@/components/ModuleState";
 
 export default function Page() {
   return (
-    <div>
-      <h1 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '2rem' }}>System Module</h1>
-      <div className="card">
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Under Development</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>
-          This section is currently being integrated and will be available shortly.
-        </p>
-      </div>
-    </div>
+    <ModuleState
+      eyebrow="Applicant module"
+      title="Notifications"
+      description="Stay updated with application changes, document requests, and appointment updates in one place."
+      features={[
+        "Unread alert summary",
+        "Application and appointment updates",
+        "Actionable notifications",
+      ]}
+      actionLabel="Back to dashboard"
+      actionHref="/applicant/dashboard"
+    />
   );
 }
